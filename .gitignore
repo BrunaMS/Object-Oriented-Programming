@@ -1,2 +1,3 @@
-OOQ12/target/
+target/
+.metadata/
 *.xml
