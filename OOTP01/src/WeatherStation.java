@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.Arrays;
 
 public class WeatherStation {
     static double[][][] temperatures = new double[10][12][31];
@@ -27,6 +28,7 @@ public class WeatherStation {
     
     public static void addMonthTemperatures(int month, int year, double[] temps){
         int yearIdx = year - 2011;  
+        month--;
         for(int i = 0; i < temperatures.length; i++){
         	temperatures[yearIdx][month][i] = temps[i];
         }
@@ -34,6 +36,7 @@ public class WeatherStation {
     
     public static void getTemperatureMean(int month, int year){
         int yearIdx = year - 2011;
+        month--;
         double mean = getMean(temperatures[yearIdx][month]);
         
         System.out.printf("Temperature Average (%d/%d): " + mean);
@@ -41,6 +44,7 @@ public class WeatherStation {
 
     public static void getTemperatureMin(int month, int year){
         int yearIdx = year - 2011;
+        month--;
         double minValue = getMin(temperatures[yearIdx][month]);
         
         System.out.printf("Minimum Temperature for this month (%d/%d): " + minValue);
@@ -48,6 +52,7 @@ public class WeatherStation {
 
     public static void getTemperatureMax(int month, int year){
         int yearIdx = year - 2011;
+        month--;
         double maxValue = getMax(temperatures[yearIdx][month]);
         
         System.out.printf("Maximum Temperature for this month (%d/%d): " + maxValue);
@@ -55,8 +60,9 @@ public class WeatherStation {
     
     public static void getMonthReport(int month, int year){
         int yearIdx = year - 2011;
+        month--;
         for(int i = 0; i < 30; i++){
-            System.out.println("Day " + (i+1) + ": " + temperatures[yearIdx][month][i++]);
+            System.out.println("Day " + (i+1) + ": " + temperatures[yearIdx][month][i]);
         }
         
         getTemperatureMean(year, month);
@@ -67,6 +73,10 @@ public class WeatherStation {
 		int input = -1, month, year; 
 		Scanner scanf = new Scanner(System.in);
 		double[] monthData = new double[31];
+		double[] test = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
+		
+		addMonthTemperatures(1, 2020, Arrays.stream(test).toArray()) ;
+		
 		do{
 			System.out.println("Choose what you want to do: ");
 			System.out.println("1 - Add data");
