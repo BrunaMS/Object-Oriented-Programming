@@ -3,8 +3,9 @@ import java.util.Arrays;
 
 public class WeatherStation {
     static double[][][] temperatures = new double[10][12][31];
+    static boolean[][] check = new boolean[10][12];
     
-    private static boolean validDate(int year, int month, int day) {
+    private static boolean validDate(int year, int month) {
     	if(year < 2011 || year > 2020) {
     		System.out.println("Invalid year. Try a year between 2011 and 2020");
     		return false;
@@ -13,7 +14,6 @@ public class WeatherStation {
     		System.out.println("Invalid month. Try one value between 1 (January) and 12 (December)");
     		return false;
     	}
-    	System.out.println("All right here =D! This is a valid date.");
     	return true;
     }
     	
@@ -42,7 +42,7 @@ public class WeatherStation {
     }
     
     private static double getMin(double[] data){
-        double minValue = 0;
+        double minValue = data[0];
         for(int i = 0; i < data.length; i++){
             if(data[i] < minValue) minValue = data[i];
         }
@@ -50,7 +50,7 @@ public class WeatherStation {
     }
     
     private static double getMax(double[] data){
-        double maxValue = 0;
+        double maxValue = data[0];
         for(int i = 0; i < data.length; i++){
             if(data[i] > maxValue) maxValue = data[i];
         }
@@ -61,42 +61,52 @@ public class WeatherStation {
         int yearIdx = year - 2011;  
         month--;
         int maxDays = getMaxDay(year, month);
-        
-        if (temps.length != maxDays) {
-        	System.out.println();
-        }
+
         for(int i = 0; i < temps.length; i++){
         	temperatures[yearIdx][month][i] = temps[i];
         }
+        check[yearIdx][month] = true;
     }
     
     public static void getTemperatureMean(int month, int year){
+        double[] data = new double[getMaxDay(year, month)];
         int yearIdx = year - 2011;
         month--;
-        double meanValue = getMean(temperatures[yearIdx][month]);
+		for(int i = 0; i < data.length; i++){
+			data[i] = temperatures[yearIdx][month][i];
+		}
+		double meanValue = getMean(data);
         
         System.out.printf("Temperature Average  (%d/%d): %.2f\n", month+1, year, meanValue);
     }
 
     public static void getTemperatureMin(int month, int year){
+        double[] data = new double[getMaxDay(year, month)];
         int yearIdx = year - 2011;
         month--;
-        double minValue = getMin(temperatures[yearIdx][month]);
+		for(int i = 0; i < data.length; i++){
+			data[i] = temperatures[yearIdx][month][i];
+		}
+		double minValue = getMin(data);
         
         System.out.printf("Minimum Temperature for this month (%d/%d): %.2f\n", month+1, year, minValue);
     }
 
     public static void getTemperatureMax(int month, int year){
+        double[] data = new double[getMaxDay(year, month)];
         int yearIdx = year - 2011;
         month--;
-        double maxValue = getMax(temperatures[yearIdx][month]);
-        
-        System.out.printf("Maximum Temperature for this month (%d/%d): %.2f\n", month+1, year, maxValue);
+		for(int i = 0; i < data.length; i++){
+			data[i] = temperatures[yearIdx][month][i];
+		}
+
+        double maxValue = getMax(data);
+        System.out.printf("Maximum Temperature for this month (%d/%d): %.2f\n", month, year, maxValue);
     }
     
     public static void getMonthReport(int month, int year){
         int yearIdx = year - 2011;
-        for(int i = 0; i < 31; i++){
+        for(int i = 0; i < getMaxDay(year, month); i++){
             System.out.println("Day " + (i+1) + ": " + temperatures[yearIdx][month - 1][i]);
         }
 
@@ -106,10 +116,11 @@ public class WeatherStation {
     }
 	public static void main(String[] args) {
 		int input = -1, month, year; 
-		Scanner scanf = new Scanner(System.in).useDelimiter("\n");
 		double[] monthData = new double[31];
 		double[] test = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 		int maxDay = 0;
+		Scanner scanf = new Scanner(System.in).useDelimiter("\n");
+		String[] inputStr;
 		
 		addMonthTemperatures(1, 2020, Arrays.stream(test).toArray()) ;
 		getMonthReport(1, 2020);
@@ -122,69 +133,94 @@ public class WeatherStation {
 			System.out.println("5 - Get monthly report");
 			System.out.println("0 - Exit");
 			
-			input = scanf.nextInt();
-			switch(input) {
-				case 0:
-					System.out.println("Finishing the program. Good bye =)");
-					break;
-				case 1:
-					System.out.println("Type the month (1 - Jan, 2 - Feb, ..., 12 - Dec):");
-					month = scanf.nextInt();
-					System.out.println("Type the year (yyyy - 2004, 2005, ... 2019, 2020):");
-					year = scanf.nextInt();
-					maxDay = getMaxDay(year, month);
-					
-					System.out.println("Type the data (separed by spaces):");
-					String[] inputStr = scanf.next().split(" "); 
-					
-					System.out.println(maxDay);
-					if(inputStr.length != maxDay){
-						System.out.println("Wrong number of days. Try again with the temperature of each day of this month.");
-						break;
-					}
-					
-					System.out.println("input (string) : " + inputStr);
-					for(int i = 0; i < inputStr.length; i++) {
-						monthData[i] = Double.parseDouble(inputStr[i]);
-					}
-					for(int i = 0; i < monthData.length && scanf.hasNextDouble(); i++) {
-						System.out.println("Month Data(" + month + "/" + year + "): " + monthData[i]);
-					}
-					addMonthTemperatures(month, year, monthData);
-					System.out.println("Temperatures successfully added!");
-					break;
-				case 2:
-					System.out.println("Type the month (1 - Jan, 2 - Feb, ..., 12 - Dec):");
-					month = scanf.nextInt();
-					System.out.println("Type the year (yyyy - 2004, 2005, ... 2019, 2020):");
-					year = scanf.nextInt();
-					getTemperatureMean(month, year);
-					break;
-				case 3:
-					System.out.println("Type the month (1 - Jan, 2 - Feb, ..., 12 - Dec):");
-					month = scanf.nextInt();
-					System.out.println("Type the year (yyyy - 2004, 2005, ... 2019, 2020):");
-					year = scanf.nextInt();
-					getTemperatureMin(month, year);
-					break;
-				case 4:
-					System.out.println("Type the month (1 - Jan, 2 - Feb, ..., 12 - Dec):");
-					month = scanf.nextInt();
-					System.out.println("Type the year (yyyy - 2004, 2005, ... 2019, 2020):");
-					year = scanf.nextInt();
-					getTemperatureMax(month, year);
-					break;
-				case 5:
-					System.out.println("Type the month (1 - Jan, 2 - Feb, ..., 12 - Dec):");
-					month = scanf.nextInt();
-					System.out.println("Type the year (yyyy - 2004, 2005, ... 2019, 2020):");
-					year = scanf.nextInt();
-					getMonthReport(month, year);
-					break;
-				default:
-					System.out.println("Invalid option, try again.");			
+			try{
+				input = scanf.nextInt();
+			}catch(java.util.InputMismatchException ex) {
+				System.out.println("You should have typed something. Rebooting...");
+				continue;
 			}
-			System.out.println("Return to the main menu");
+			
+			if(input > 0 && input <= 5) {
+				System.out.println("Type the month (1 - Jan, 2 - Feb, ..., 12 - Dec):");
+				try {
+					month = scanf.nextInt();
+				}catch(java.util.InputMismatchException ex) {
+					System.out.println("You should have typed something. Rebooting...");
+					System.out.println("You should have typed something. Rebooting...");
+					continue;
+				}
+				
+				System.out.println("Type the year (yyyy - 2004, 2005, ... 2019, 2020):");
+				try{
+					year = scanf.nextInt();
+				}catch(java.util.InputMismatchException ex) {
+					System.out.println("You should have typed something. Rebooting...");
+					continue;
+				}
+				validDate(year, month);
+
+				switch(input) {
+					case 1:
+						maxDay = getMaxDay(year, month);
+						
+						System.out.println("Number of days in this month:" + maxDay);
+						System.out.println("Type the data (separed by spaces):");
+						try {
+							inputStr = scanf.next().split(" "); 
+						}catch(java.util.InputMismatchException ex) {
+							System.out.println("You should have typed something. Rebooting...");
+							continue;
+						}
+						if(inputStr.length != maxDay){
+							System.out.println("Wrong number of days. Try again with the temperature for each day of this month.");
+							break;
+						}
+						
+						for(int i = 0; i < inputStr.length; i++) {
+							monthData[i] = Double.parseDouble(inputStr[i]);
+							System.out.println("Month Data(" + month + "/" + year + "): " + monthData[i]);
+						}
+						addMonthTemperatures(month, year, monthData);
+						System.out.println("Temperatures successfully added!");
+						break;
+					case 2:
+						if(!check[year - 2011][month - 1]) {
+							System.out.println("There is nothing for this month.");
+							continue;
+						}
+						getTemperatureMean(month, year);
+						break;
+					case 3:
+						if(!check[year - 2011][month - 1]) {
+							System.out.println("There is nothing for this month.");
+							continue;
+						}
+						getTemperatureMin(month, year);
+						break;
+					case 4:
+						if(!check[year - 2011][month - 1]) {
+							System.out.println("There is nothing for this month.");
+							continue;
+						}
+						getTemperatureMax(month, year);
+						break;
+					case 5:
+						if(!check[year - 2011][month - 1]) {
+							System.out.println("There is nothing for this month.");
+							continue;
+						}
+						getMonthReport(month, year);
+						break;
+				}
+				System.out.println("Return to the main menu");
+			}else if(input == 0) {
+				System.out.println("Finishing the program. Good bye =)");
+				break;
+			}
+			else {
+				System.out.println("Invalid option, try again.");
+			}
+			
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
